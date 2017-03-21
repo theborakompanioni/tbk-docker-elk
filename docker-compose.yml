@@ -1,0 +1,50 @@
+version: '2'
+
+networks:
+  logging:
+    driver: bridge
+
+services:
+
+###
+# ELK stack + logspout
+###
+  elasticsearch:
+    extends:
+      file: docker-compose-elk-common.yml
+      service: elasticsearch
+    build: dockerfiles/elasticsearch
+    container_name: tbk-elk-elasticsearch1
+
+  logstash:
+    extends:
+      file: docker-compose-elk-common.yml
+      service: logstash
+    build: dockerfiles/logstash
+    container_name: tbk-elk-logstash1
+    links:
+      - elasticsearch:elasticsearch
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    extends:
+      file: docker-compose-elk-common.yml
+      service: kibana
+    build: dockerfiles/kibana
+    container_name: tbk-elk-kibana1
+    depends_on:
+      - elasticsearch
+
+  logspout:
+    extends:
+      file: docker-compose-elk-common.yml
+      service: logspout
+    container_name: tbk-elk-logspout1
+    links:
+      - logstash:logstash
+    depends_on:
+      - logstash
+###
+# ELK stack + logspout (end)
+###

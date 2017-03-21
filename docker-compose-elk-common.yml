@@ -1,0 +1,62 @@
+version: '2'
+
+services:
+  elasticsearch:
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - ES_JAVA_OPTS="-Xmx256m -Xms256m"
+      # disable X-Pack
+      # see https://www.elastic.co/guide/en/x-pack/current/xpack-settings.html
+      #     https://www.elastic.co/guide/en/x-pack/current/installing-xpack.html#xpack-enabling
+      - xpack.security.enabled="false"
+      - xpack.monitoring.enabled="false"
+      - xpack.graph.enabled="false"
+      - xpack.watcher.enabled="false"
+    networks:
+      - logging
+    volumes:
+      - ./docker-data/tbk-elk-stuff/elasticsearch/:/opt/elasticsearch/data
+      - ./dockerfiles/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+
+  logstash:
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+      - "5000:5000/udp"
+    environment:
+      - LOGSPOUT=ignore # otherwise logstash will keep sending its own logs to itself
+      - LS_JAVA_OPTS="-Xmx256m -Xms256m"
+    networks:
+      - logging
+    volumes:
+      - ./dockerfiles/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./dockerfiles/logstash/pipeline:/usr/share/logstash/pipeline
+    logging:
+      driver: none
+
+  kibana:
+    restart: unless-stopped
+    ports:
+      - "8084:80"
+    environment:
+      - LOGSPOUT=ignore
+    networks:
+      - logging
+    volumes:
+      - ./kibana/config/:/usr/share/kibana/config
+
+  logspout:
+    image: gliderlabs/logspout:master
+    restart: unless-stopped
+    ports:
+      - "8083:80"
+    environment:
+      - DEBUG=true
+    networks:
+      - logging
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: syslog://logstash:5000
