@@ -7,14 +7,14 @@ services:
       - "9200:9200"
       - "9300:9300"
     environment:
-      - ES_JAVA_OPTS="-Xmx256m -Xms256m"
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
       # disable X-Pack
       # see https://www.elastic.co/guide/en/x-pack/current/xpack-settings.html
       #     https://www.elastic.co/guide/en/x-pack/current/installing-xpack.html#xpack-enabling
-      - xpack.security.enabled="false"
-      - xpack.monitoring.enabled="false"
-      - xpack.graph.enabled="false"
-      - xpack.watcher.enabled="false"
+      xpack.security.enabled: "false"
+      xpack.monitoring.enabled: "false"
+      xpack.graph.enabled: "false"
+      xpack.watcher.enabled: "false"
     networks:
       - logging
     volumes:
@@ -27,8 +27,8 @@ services:
       - "5000:5000"
       - "5000:5000/udp"
     environment:
-      - LOGSPOUT=ignore # otherwise logstash will keep sending its own logs to itself
-      - LS_JAVA_OPTS="-Xmx256m -Xms256m"
+      LOGSPOUT: "ignore" # otherwise logstash will keep sending its own logs to itself
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
       - logging
     volumes:
@@ -42,7 +42,7 @@ services:
     ports:
       - "8084:80"
     environment:
-      - LOGSPOUT=ignore
+      LOGSPOUT: "ignore"
     networks:
       - logging
     volumes:
@@ -54,7 +54,7 @@ services:
     ports:
       - "8083:80"
     environment:
-      - DEBUG=true
+      DEBUG: "true"
     networks:
       - logging
     volumes:
