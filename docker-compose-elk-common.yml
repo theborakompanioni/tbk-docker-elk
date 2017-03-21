@@ -46,7 +46,7 @@ services:
     networks:
       - logging
     volumes:
-      - ./kibana/config/:/usr/share/kibana/config
+      - ./dockerfiles/kibana/config/:/usr/share/kibana/config
 
   logspout:
     image: gliderlabs/logspout:master
